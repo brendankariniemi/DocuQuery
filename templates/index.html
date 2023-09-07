@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>DocuQuery</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<div class="side-container" id="left-side">
+    <div id="form-container">
+        <form id="upload-form" method="POST" enctype="multipart/form-data" action="/upload">
+            <input type="file" name="document" accept=".pdf" onchange="$('#upload-form').submit()">
+        </form>
+    </div>
+    <iframe id="pdf-embed" src=""></iframe>
+</div>
+
+<div class="side-container" id="right-side">
+    <h1>DocuQuery</h1>
+    <h2>Summary</h2>
+    <label class="text-output">
+        <textarea id="summary-output" readonly></textarea>
+    </label>
+
+    <h2>Question</h2>
+    <div id="question-input-container">
+        <label for="question-input"></label><input type="text" id="question-input" placeholder="Enter your question">
+        <button id="ask-question-btn">Ask Question</button>
+    </div>
+
+    <label class="text-output">
+        <textarea id="answer-output" readonly></textarea>
+    </label>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Function to upload a new PDF
+        function uploadPDF(form_data) {
+            $.ajax({
+                type: 'POST',
+                url: '/upload',
+                data: form_data,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    clearFields();
+                    replacePdfSrc('/' + data.pdf_url, 1);
+                    getPDFSummary();
+                }
+            });
+        }
+
+        // Function to clear output fields
+        function clearFields() {
+            $('#summary-output').val('');
+            $('#answer-output').val('');
+            $('#question-input').val('');
+        }
+
+        // Function to replace the PDF src
+        function replacePdfSrc(pdf_url, page_number) {
+            var cache_param = '?cache=' + Date.now()
+            var page_param = '#page=' + page_number
+            pdf_url = pdf_url + cache_param + page_param;
+            $('#pdf-embed').attr('src', pdf_url);
+        }
+
+        // Function to get PDF summary
+        function getPDFSummary() {
+            $('#summary-output').val('Loading...');
+            $.get('/summarize', function (data) {
+                $('#summary-output').val(data.summary);
+            });
+        }
+
+        // Function to get question answer
+        function getQuestionAnswer() {
+            $('#answer-output').val('Loading...');
+            var question = $('#question-input').val();
+            $.get('/ask_question/' + question, function (data) {
+                $('#answer-output').val(data.answer);
+                var currentSrc = $('#pdf-embed').attr('src');
+                replacePdfSrc(currentSrc.split('?')[0], data.page_number + 1);
+            });
+        }
+
+        // Handle form submission
+        $('#upload-form').submit(function (event) {
+            event.preventDefault();
+            var form_data = new FormData(this);
+            uploadPDF(form_data);
+        });
+
+        // Handle ask question button click
+        $('#ask-question-btn').click(function () {
+            getQuestionAnswer();
+        });
+
+        // Initialize the PDF src
+        replacePdfSrc('/documents/DocuQuery.pdf', 1)
+
+        // Initialize PDF summary
+        getPDFSummary();
+    });
+</script>
+
+</body>
+</html>
