@@ -37,4 +37,10 @@ pip install -r requirements.txt
 
 ```
 flask run
+
 ```
+
+## Example
+
+<img src="https://github.com/brendankariniemi/DocuQuery/assets/138073658/990d17d6-6039-4bc6-811b-40ec07ad1040" width="1510" alt="Screeshot">
+
