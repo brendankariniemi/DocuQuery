@@ -1,8 +1,8 @@
-from langchain import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain.chains import RetrievalQAWithSourcesChain
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.llms.openai import OpenAI
+from langchain.vectorstores.chroma import Chroma
 
 from caching import get_cached_data, cache_data
 from utils import load_and_split_text, get_file_hash

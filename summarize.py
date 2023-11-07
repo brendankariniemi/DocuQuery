@@ -1,6 +1,6 @@
-from langchain import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain.chains.summarize import load_summarize_chain
+from langchain.llms import OpenAI
 
 from caching import get_cached_data, cache_data
 from config import SUMMARIZE_DOCUMENTS, DOCUQUERY_PDF, DOCUQUERY_SUMMARY
