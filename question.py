@@ -1,3 +1,5 @@
+import os
+
 from langchain.callbacks import get_openai_callback
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.embeddings import OpenAIEmbeddings
@@ -5,19 +7,24 @@ from langchain.llms.openai import OpenAI
 from langchain.vectorstores.chroma import Chroma
 
 from caching import get_cached_data, cache_data
-from utils import load_and_split_text, get_file_hash
+from utils import load_and_split_text
 
 
-def get_answer(question, file_path):
+def get_answer(question):
+    """Return answer to *question* by searching across all pre-populated documents."""
     try:
-        cache_key = 'Embeddings - ' + get_file_hash(file_path)
-        embeddings = get_cached_data(cache_key)
-
+        embeddings = get_cached_data('Embeddings')
         if embeddings is None:
             embeddings = OpenAIEmbeddings()
-            cache_data(cache_key, embeddings)
+            cache_data('Embeddings', embeddings)
 
-        texts = load_and_split_text(file_path)
+        # Gather and split text from every supported document in /documents
+        docs_dir = 'documents'
+        texts = []
+        for filename in os.listdir(docs_dir):
+            if filename.lower().endswith(('.pdf', '.txt')):
+                texts.extend(load_and_split_text(os.path.join(docs_dir, filename)))
+
         vectors = Chroma.from_documents(texts, embeddings)
 
         chain = RetrievalQAWithSourcesChain.from_chain_type(OpenAI(temperature=0), chain_type="map_rerank",
