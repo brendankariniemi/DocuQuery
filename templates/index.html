@@ -14,11 +14,6 @@
 
 <div class="side-container" id="right-side">
     <h1>DocuQuery</h1>
-    <h2>Summary</h2>
-    <label class="text-output">
-        <textarea id="summary-output" readonly></textarea>
-    </label>
-
     <h2>Question</h2>
     <div id="question-input-container">
         <label for="question-input"></label><input type="text" id="question-input" placeholder="Enter your question">
@@ -41,16 +36,13 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    clearFields();
                     replacePdfSrc('/' + data.pdf_url, 1);
-                    getPDFSummary();
                 }
             });
         }
 
         // Function to clear output fields
         function clearFields() {
-            $('#summary-output').val('');
             $('#answer-output').val('');
             $('#question-input').val('');
         }
@@ -61,14 +53,6 @@
             var page_param = '#page=' + page_number
             pdf_url = pdf_url + cache_param + page_param;
             $('#pdf-embed').attr('src', pdf_url);
-        }
-
-        // Function to get PDF summary
-        function getPDFSummary() {
-            $('#summary-output').val('Loading...');
-            $.get('/summarize', function (data) {
-                $('#summary-output').val(data.summary);
-            });
         }
 
         // Function to get question answer
@@ -96,9 +80,6 @@
 
         // Initialize the PDF src
         replacePdfSrc('/documents/DocuQuery.pdf', 1)
-
-        // Initialize PDF summary
-        getPDFSummary();
     });
 </script>
 

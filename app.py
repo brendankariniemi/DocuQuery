@@ -3,9 +3,8 @@ import os
 from flask import Flask, render_template, jsonify, send_from_directory
 
 from caching import init_caching
-from config import OPENAI_API_KEY, DOCUQUERY_PDF
+from config import OPENAI_API_KEY
 from question import get_answer
-from summarize import generate_summary
 
 app = Flask(__name__)
 init_caching(app)
@@ -30,12 +29,6 @@ def serve_pdf(filename):
 def ask_question(question):
     answer, page = get_answer(question)
     return jsonify({'answer': answer, 'page_number': page})
-
-
-@app.route('/summarize')
-def summarize():
-    summary = generate_summary(DOCUQUERY_PDF)
-    return jsonify({'summary': summary})
 
 
 if __name__ == '__main__':
