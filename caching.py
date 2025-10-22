@@ -1,14 +1,12 @@
 from flask_caching import Cache
 
-from config import DOCUQUERY_PDF
-
 cache = Cache()
 
 
 def init_caching(app):
     app.config['CACHE_TYPE'] = 'SimpleCache'
     cache.init_app(app)
-    cache_data('uploaded_file', DOCUQUERY_PDF)
+    # Removed default uploaded_file cache – no uploads in new workflow
 
 
 def cache_data(key, data, timeout=3600):
